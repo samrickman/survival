@@ -359,7 +359,7 @@ function(formula, newdata, se.fit=FALSE, conf.int=.95, individual=FALSE,
         else x2 <- model.matrix(Terms2, mf2)[,-1, drop=FALSE]  #no intercept
     }
 
-    if (has.strata && !is.null(mf2[[stangle$vars]])){
+    if (has.strata && !all(vapply(stangle$vars, function(x) is.null(mf2[[x]]), logical(1)))){
         mf2 <- mf2[is.na(match(names(mf2), stangle$vars))]
         mf2 <- unique(mf2)
         x2 <- unique(x2)
@@ -417,10 +417,11 @@ function(formula, newdata, se.fit=FALSE, conf.int=.95, individual=FALSE,
             cifit$cumhaz[rtemp[[i]],,] <- tfit[[i]]$cumhaz
         }
     }
-    cifit$newdata <- mf2
+
+    cifit$newdata <- newdata
 
     cifit$call <- Call
-    class(cifit) <- c("survfitms", "survfit")
+    class(cifit) <- c("survfitcoxms", "survfitms", "survfit")
     cifit
 }
 # Compute the hazard  and survival functions 
